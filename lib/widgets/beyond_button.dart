@@ -29,9 +29,12 @@ class _BeyondButtonState extends State<BeyondButton>
     super.initState();
   }
 
-  void _onTapDown(TapDownDetails _) {
+  void _onTapDown(TapDownDetails details) {
     _controller.forward();
-    setState(() => _scale = 0.96);
+    setState(() => _scale = 0.95);
+
+    // Trigger particle effect
+    _showParticleEffect(details.globalPosition);
   }
 
   void _onTapUp(TapUpDetails _) {
@@ -43,6 +46,25 @@ class _BeyondButtonState extends State<BeyondButton>
   void _onTapCancel() {
     _controller.reverse();
     setState(() => _scale = 1.0);
+  }
+
+  void _showParticleEffect(Offset position) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned.fill(
+          child: IgnorePointer(
+            child: CustomPaint(
+              painter: CharcoalParticlesPainter(position),
+            ),
+          ),
+        );
+      },
+    );
+    overlay.insert(overlayEntry);
+    Future.delayed(const Duration(milliseconds: 400), () {
+      overlayEntry.remove();
+    });
   }
 
   @override
@@ -62,68 +84,71 @@ class _BeyondButtonState extends State<BeyondButton>
       child: AnimatedScale(
         scale: _scale,
         duration: const Duration(milliseconds: 120),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: Stack(
-            children: [
-              // Glass blur background
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  height: 58,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.25),
-                        Colors.white.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1.2,
-                    ),
-                    boxShadow: [
-                      // Outer glow in brand coral-red
-                      BoxShadow(
-                        color: const Color(0xFFFF4D4D).withOpacity(0.7),
-                        blurRadius: 18,
-                        spreadRadius: 1,
-                      ),
-                      // Depth shadow
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        offset: const Offset(0, 6),
-                        blurRadius: 12,
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.6,
-                        fontSize: 17,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            offset: Offset(0, 1),
-                            blurRadius: 2,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+        child: Container(
+          height: 58,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF2E2E2E), Color(0xFF1C1C1C)], // Charcoal gradient
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(29), // Cylindrical
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.6),
+                offset: const Offset(0, 6),
+                blurRadius: 12,
+                spreadRadius: 1,
+              ),
+              BoxShadow(
+                color: const Color(0xFF3A3A3A).withOpacity(0.6),
+                offset: const Offset(0, -2),
+                blurRadius: 6,
+                spreadRadius: -1,
               ),
             ],
+          ),
+          child: Center(
+            child: Text(
+              widget.label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.6,
+                fontSize: 17,
+                shadows: [
+                  Shadow(
+                    color: Colors.black26,
+                    offset: Offset(0, 1),
+                    blurRadius: 2,
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+class CharcoalParticlesPainter extends CustomPainter {
+  final Offset position;
+  CharcoalParticlesPainter(this.position);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF1C1C1C).withOpacity(0.7)
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 10; i++) {
+      final dx = (position.dx + (i * 6 - 30)) + (i.isEven ? -5 : 5);
+      final dy = (position.dy + (i * 3 - 15)) + (i.isOdd ? -5 : 5);
+      canvas.drawCircle(Offset(dx, dy), 3, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

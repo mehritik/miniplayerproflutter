@@ -88,20 +88,28 @@ class PermissionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Colors for backgrounds
+    final backgroundColor = isDark
+        ? const Color(0xFF1C1C1C) // Charcoal black
+        : const Color(0xFFEFF6FF); // White with slight bluish tint (#EFF6FF ≈ 10% blue)
+
+    final gradientColors = isDark
+        ? [const Color(0xFF1C1C1C), const Color(0xFF000000)]
+        : [const Color(0xFFEFF6FF), const Color(0xFFDDEAFB)];
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor,
       body: Stack(
         children: [
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: RadialGradient(
-                  center: Alignment(0.0, -0.3),
+                  center: const Alignment(0.0, -0.3),
                   radius: 1.2,
-                  colors: [
-                    Color(0xFFFF4D4D),
-                    Colors.black,
-                  ],
+                  colors: gradientColors,
                 ),
               ),
             ),
@@ -113,39 +121,40 @@ class PermissionScreen extends StatelessWidget {
                 SizedBox(
                   height: 280,
                   child: ModelViewer(
-                    src: 'assets/models/permission.glb',
+                    src: 'assets/models/volcano.glb',
                     alt: 'Permission Model',
                     autoRotate: true,
                     disableZoom: true,
+                    interactionPrompt: InteractionPrompt.none,
                     disablePan: true,
                     backgroundColor: Colors.transparent,
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'Allow Permission',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                     shadows: [
                       Shadow(
                         blurRadius: 8,
-                        color: Colors.black45,
-                        offset: Offset(0, 2),
+                        color: isDark ? Colors.black45 : Colors.grey.withOpacity(0.3),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 28.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: Text(
                     'We need access to your videos so we can show them in your library.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.white70,
+                      color: isDark ? Colors.white70 : Colors.black87,
                     ),
                   ),
                 ),
@@ -154,7 +163,8 @@ class PermissionScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 60.0),
                   child: BeyondButton(
                     label: 'Allow',
-                    onPressed: () => _handlePermission(context),
+                    // onPressed: () => _handlePermission(context),
+                    onPressed: () {},
                   ),
                 ),
               ],
@@ -164,4 +174,5 @@ class PermissionScreen extends StatelessWidget {
       ),
     );
   }
+
 }
