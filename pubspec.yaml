@@ -1,0 +1,30 @@
+name: miniplayerpro
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  model_viewer_plus: ^1.9.3
+  photo_manager: ^3.7.1
+  permission_handler: ^12.0.1
+#  device_info_plus: ^11.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/models/permission.glb
+    - assets/images/volcano.png
